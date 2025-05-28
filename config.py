@@ -19,6 +19,11 @@ MODES = {
     "tls": True
 }
 
+TIMEOUT = 30
+MAX_CONNECTIONS = 1000
+KEEPALIVE = True
+TCP_NODELAY = True
+
 # The domain for TLS mode, bad clients are proxied there
 # Use random existing domain, proxy checks it on start
 # TLS_DOMAIN = "www.google.com"

@@ -1,7 +1,7 @@
 services:
   mtprotoproxy:
     build: .
-    restart: unless-stopped
+    restart: always
     network_mode: "host"
     volumes:
         - ./config.py:$HOME/mtprotoproxy/config.py
@@ -12,4 +12,21 @@ services:
         options:
             max-file: "10"
             max-size: "10m"
-#    mem_limit: 1024m
+    healthcheck:
+      test: ["CMD-SHELL", "curl --silent --max-time 3 http://localhost:6969 || exit 1"]
+      interval: 15s      # Kiểm tra mỗi 30 giây
+      timeout: 5s       # Timeout 10 giây
+      retries: 1         # Fail 2 lần liên tiếp thì unhealthy
+      start_period: 60s  # Chờ 60s sau khi start mới bắt đầu check
+
+  # Container tự động restart khi unhealthy
+  autoheal:
+    image: willfarrell/autoheal:latest
+    container_name: autoheal
+    restart: always
+    environment:
+      - AUTOHEAL_CONTAINER_LABEL=all
+      - AUTOHEAL_INTERVAL=5
+      - AUTOHEAL_START_PERIOD=0
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
